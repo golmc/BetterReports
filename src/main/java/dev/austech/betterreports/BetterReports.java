@@ -30,14 +30,11 @@ import dev.austech.betterreports.commands.ReportCommand;
 import dev.austech.betterreports.commands.ReportPlayerCommand;
 import dev.austech.betterreports.util.Common;
 import dev.austech.betterreports.util.Counter;
-import dev.austech.betterreports.util.UpdateCheck;
-import dev.austech.betterreports.util.VersionUtil;
 import dev.austech.betterreports.util.config.ConfigManager;
 import dev.austech.betterreports.util.config.impl.MainConfig;
 import dev.austech.betterreports.util.menu.listener.MenuListener;
 import lombok.Getter;
 import lombok.Setter;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -71,9 +68,6 @@ public class BetterReports extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             usePlaceholderApi = true;
         }
-
-        new UpdateCheck("br", this).check();
-        new Metrics(this, 15884);
 
         Bukkit.getPluginManager().registerEvents(new MenuListener(), this);
 

@@ -23,6 +23,7 @@
  */
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.kotlin.dsl.register
 
 plugins {
     java
@@ -39,7 +40,7 @@ version = "2.0.7"
 repositories {
     mavenLocal()
     maven {
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+        url = uri("https://repo.papermc.io/repository/maven-public/")
     }
 
     maven {
@@ -56,7 +57,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.12-R0.1-SNAPSHOT")
+    compileOnly("dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("org.jetbrains:annotations:23.0.0")
     implementation("org.bstats:bstats-bukkit:3.0.0")
@@ -68,14 +69,14 @@ fun getCommitsSinceLastTag(): Int {
         return -1
     }
 
-    var tags = indraGit.tags()
+    val tags = indraGit.tags()
     var depth = 0
     val walk = org.eclipse.jgit.revwalk.RevWalk(indraGit.git()!!.repository)
     var commit = walk.parseCommit(indraGit.commit())
 
     while (true) {
         for (tag in tags) {
-            if (walk.parseCommit(tag.getLeaf().getObjectId()) == commit) {
+            if (walk.parseCommit(tag.leaf.objectId) == commit) {
                 walk.dispose()
                 return depth
             }
@@ -86,17 +87,17 @@ fun getCommitsSinceLastTag(): Int {
 }
 
 ext {
-    val GIT_COMMIT = if (!indraGit.isPresent()) "unknown" else indraGit.commit()?.abbreviate(7)?.name() ?: "unknown"
-    val GIT_DEPTH = getCommitsSinceLastTag()
+    val gitCommit = if (!indraGit.isPresent) "unknown" else indraGit.commit()?.abbreviate(7)?.name() ?: "unknown"
+    val gitDepth = getCommitsSinceLastTag()
 
-    val fullVersion = "$version".replace("-SNAPSHOT", "-dev+${GIT_DEPTH}-${GIT_COMMIT}")
+    val fullVersion = "$version".replace("-SNAPSHOT", "-dev+${gitDepth}-${gitCommit}")
 
     set("fullVersion", fullVersion)
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -109,7 +110,7 @@ tasks.withType<ProcessResources> {
     outputs.upToDateWhen { false }
 }
 
-task<Copy>("copyJars") {
+tasks.register<Copy>("copyJars") {
     from(tasks.findByPath("shadowJar"))
     rename(".*-all.jar", project.name + "-" + project.ext["fullVersion"] + ".jar")
     into("jars")
@@ -129,7 +130,7 @@ fun register(name: String, path: String) {
 
 register("mnewt00", "C:\\Users\\mnewt\\Desktop\\Servers\\1.20\\plugins")
 
-task("cleanJars") {
+tasks.register("cleanJars") {
     delete("jars")
 }
 

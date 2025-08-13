@@ -77,7 +77,7 @@ public class DiscordManager {
             builder.content(PING_VALUE);
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(BetterReports.getInstance(), () -> {
+        Bukkit.getAsyncScheduler().runNow(BetterReports.getInstance(), (task) -> {
             try {
                 final Webhook webhook = builder.build();
                 webhook.send(WEBHOOK_URI);

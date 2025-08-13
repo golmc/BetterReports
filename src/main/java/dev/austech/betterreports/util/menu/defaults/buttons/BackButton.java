@@ -24,11 +24,9 @@
 
 package dev.austech.betterreports.util.menu.defaults.buttons;
 
-import dev.austech.betterreports.util.StackBuilder;
 import dev.austech.betterreports.util.config.impl.GuiConfig;
 import dev.austech.betterreports.util.menu.Menu;
 import dev.austech.betterreports.util.menu.layout.MenuButton;
-import dev.austech.betterreports.util.xseries.XMaterial;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;

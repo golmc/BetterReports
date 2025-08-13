@@ -60,7 +60,7 @@ public class Counter {
     }
 
     private void save() {
-        Bukkit.getScheduler().runTaskAsynchronously(BetterReports.getInstance(), () -> {
+        Bukkit.getAsyncScheduler().runNow(BetterReports.getInstance(), (task) -> {
             try {
                 final String str = "G: " + globalCounter + "\nB: " + bugCounter + "\nP: " + playerCounter;
                 Files.write(file.toPath(), str.getBytes(StandardCharsets.UTF_8));

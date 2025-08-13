@@ -25,12 +25,10 @@
 package dev.austech.betterreports.util.menu.defaults.paged.buttons;
 
 import dev.austech.betterreports.BetterReports;
-import dev.austech.betterreports.util.StackBuilder;
 import dev.austech.betterreports.util.config.impl.GuiConfig;
 import dev.austech.betterreports.util.menu.defaults.paged.ListPageMenu;
 import dev.austech.betterreports.util.menu.defaults.paged.PagedMenu;
 import dev.austech.betterreports.util.menu.layout.MenuButton;
-import dev.austech.betterreports.util.xseries.XMaterial;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -66,7 +64,7 @@ public class PageButton extends MenuButton {
                     GuiConfig.Values.SOUNDS_GENERIC_ERROR.playSound(player);
                     setShouldError(true);
                     event.setCurrentItem(getItem(player));
-                    Bukkit.getScheduler().runTaskLater(BetterReports.getInstance(), () -> setShouldError(false), 30);
+                    Bukkit.getGlobalRegionScheduler().runDelayed(BetterReports.getInstance(), (task) -> setShouldError(false), 30);
                 }
             } else {
                 new ListPageMenu(pagedMenu, current).open(player);

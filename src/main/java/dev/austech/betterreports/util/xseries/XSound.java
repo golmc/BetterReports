@@ -23,15 +23,10 @@ package dev.austech.betterreports.util.xseries;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Strings;
-import org.bukkit.Instrument;
 import org.bukkit.Location;
-import org.bukkit.Note;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1785,40 +1780,6 @@ public enum XSound {
     }
 
     /**
-     * Plays an instrument's notes in an ascending form.
-     * This method is not really relevant to this utility class, but a nice feature.
-     *
-     * @param plugin      the plugin handling schedulers.
-     * @param player      the player to play the note from.
-     * @param playTo      the entity to play the note to.
-     * @param instrument  the instrument.
-     * @param ascendLevel the ascend level of notes. Can only be positive and not higher than 7
-     * @param delay       the delay between each play.
-     * @return the async task handling the operation.
-     * @since 2.0.0
-     */
-    @NotNull
-    public static BukkitTask playAscendingNote(@NotNull Plugin plugin, @NotNull Player player, @NotNull Entity playTo, @NotNull Instrument instrument,
-                                               int ascendLevel, int delay) {
-        Objects.requireNonNull(player, "Cannot play note from null player");
-        Objects.requireNonNull(playTo, "Cannot play note to null entity");
-
-        if (ascendLevel <= 0) throw new IllegalArgumentException("Note ascend level cannot be lower than 1");
-        if (ascendLevel > 7) throw new IllegalArgumentException("Note ascend level cannot be greater than 7");
-        if (delay <= 0) throw new IllegalArgumentException("Delay ticks must be at least 1");
-
-        return new BukkitRunnable() {
-            int repeating = ascendLevel;
-
-            @Override
-            public void run() {
-                player.playNote(playTo.getLocation(), instrument, Note.natural(1, Note.Tone.values()[ascendLevel - repeating]));
-                if (repeating-- == 0) cancel();
-            }
-        }.runTaskTimerAsynchronously(plugin, 0, delay);
-    }
-
-    /**
      * In most cases you should be using {@link #name()} instead.
      *
      * @return a friendly readable string name.
@@ -1855,59 +1816,6 @@ public enum XSound {
      */
     public boolean isSupported() {
         return this.parseSound() != null;
-    }
-
-    /**
-     * Plays a sound repeatedly with the given delay at a moving target's location.
-     *
-     * @param plugin the plugin handling schedulers. (You can replace this with a static instance)
-     * @param entity the entity to play the sound to. We exactly need an entity to keep the track of location changes.
-     * @param volume the volume of the sound.
-     * @param pitch  the pitch of the sound.
-     * @param repeat the amount of times to repeat playing.
-     * @param delay  the delay between each repeat.
-     * @return the async task handling this operation.
-     * @see #play(Location, float, float)
-     * @since 2.0.0
-     */
-    @NotNull
-    public BukkitTask playRepeatedly(@NotNull Plugin plugin, @NotNull Entity entity, float volume, float pitch, int repeat, int delay) {
-        return playRepeatedly(plugin, Collections.singleton(entity), volume, pitch, repeat, delay);
-    }
-
-    /**
-     * Plays a sound repeatedly with the given delay at moving targets' locations.
-     *
-     * @param plugin   the plugin handling schedulers. (You can replace this with a static instance)
-     * @param entities the entities to play the sound to. We exactly need the entities to keep the track of location changes.
-     * @param volume   the volume of the sound.
-     * @param pitch    the pitch of the sound.
-     * @param repeat   the amount of times to repeat playing.
-     * @param delay    the delay between each repeat.
-     * @return the async task handling this operation.
-     * @see #play(Location, float, float)
-     * @since 2.0.0
-     */
-    @NotNull
-    public BukkitTask playRepeatedly(@NotNull Plugin plugin, @NotNull Iterable<? extends Entity> entities, float volume, float pitch, int repeat, int delay) {
-        Objects.requireNonNull(plugin, "Cannot play repeating sound from null plugin");
-        Objects.requireNonNull(entities, "Cannot play repeating sound at null locations");
-
-        if (repeat <= 0) throw new IllegalArgumentException("Cannot repeat playing sound " + repeat + " times");
-        if (delay <= 0) throw new IllegalArgumentException("Delay ticks must be at least 1");
-
-        return new BukkitRunnable() {
-            int repeating = repeat;
-
-            @Override
-            public void run() {
-                for (Entity entity : entities) {
-                    play(entity.getLocation(), volume, pitch);
-                }
-
-                if (repeating-- == 0) cancel();
-            }
-        }.runTaskTimer(plugin, 0, delay);
     }
 
     /**

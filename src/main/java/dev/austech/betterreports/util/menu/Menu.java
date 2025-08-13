@@ -28,13 +28,13 @@ import dev.austech.betterreports.BetterReports;
 import dev.austech.betterreports.util.Common;
 import dev.austech.betterreports.util.menu.defaults.paged.PagedMenu;
 import dev.austech.betterreports.util.menu.layout.MenuButton;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -110,23 +110,18 @@ public abstract class Menu {
         MenuManager.OPENED_MENUS.put(player.getUniqueId(), this);
         onOpen(player);
 
-        final BukkitRunnable runnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!player.isOnline()) {
-                    cancel();
-                    MenuManager.OPENED_MENUS.remove(player.getUniqueId());
-                    return;
-                }
-
-                if (isAutoUpdate()) {
-                    update(player);
-                }
+        ScheduledTask scheduledTask = Bukkit.getGlobalRegionScheduler().runAtFixedRate(BetterReports.getInstance(), (task) -> {
+            if (!player.isOnline()) {
+                task.cancel();
+                MenuManager.OPENED_MENUS.remove(player.getUniqueId());
+                return;
             }
-        };
-
-        runnable.runTaskTimer(BetterReports.getInstance(), 10L, 10L); // Update every .5 seconds, with the first task starting after .5 seconds.
-        MenuManager.CHECK_TASKS.put(player.getUniqueId(), runnable);
+            
+            if (isAutoUpdate()) {
+                update(player);
+            }
+        }, 10L, 10L); // Update every .5 seconds, with the first task starting after .5 seconds.
+        MenuManager.CHECK_TASKS.put(player.getUniqueId(), scheduledTask);
     }
 
     public final void update(Player player) {
